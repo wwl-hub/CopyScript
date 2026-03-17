@@ -14,10 +14,6 @@ input{width:100%;background:#374151;border:none;border-radius:12px;padding:14px 
 button{width:100%;background:#2563eb;color:#fff;border:none;border-radius:12px;padding:14px;font-size:16px;font-weight:600}
 .result{background:#374151;border-radius:12px;padding:16px;margin-top:16px;white-space:pre-wrap;line-height:1.6}
 .tip{font-size:12px;color:#9ca3af;text-align:center;margin-top:12px}
-.pay{border:1px solid #f59e06;text-align:center;padding:25px}
-.pay-title{color:#fbbf24;font-size:18px;margin-bottom:10px}
-.price{font-size:20px;font-weight:700;color:#fff;margin:12px 0}
-.qrcode{width:180px;height:180px;margin:10px auto;border-radius:10px}
 </style>
 </head>
 
@@ -28,53 +24,24 @@ button{width:100%;background:#2563eb;color:#fff;border:none;border-radius:12px;p
   <div class="desc">抖音链接粘贴，一键提取真实文案</div>
   <input id="url" placeholder="粘贴抖音分享链接..." type="text">
   <button onclick="getScript()">立即提取</button>
-  <div class="tip" id="tip">剩余免费次数：3 次</div>
 </div>
 
 <div id="result" style="display:none" class="result"></div>
 
-<div class="card pay" id="pay" style="display:none">
-  <div class="pay-title">免费次数已用完</div>
-  <div class="desc">开通会员，无限次提取</div>
-  <div class="price">29.9 元 / 永久</div>
-
-  <img class="qrcode" src="data:image/png;base64,这里替换成你的微信收款码base64">
-
-  <div class="desc" style="margin-top:10px">支付后即可使用</div>
-</div>
-
 <script>
-let count = parseInt(localStorage.getItem('copy_cnt') || 0)
-updateTip()
-
-function updateTip(){
-  const left = Math.max(0, 3 - count)
-  document.getElementById('tip').innerText = `Free: ${left} times left`
-}
-
 async function getScript(){
-  if(count >= 3){
-    document.getElementById('result').style.display='none'
-    document.getElementById('pay').style.display='block'
-    return
-  }
-
   let url = document.getElementById('url').value.trim()
   if(!url){
     showResult("请输入抖音链接")
     return
   }
 
-  // 真实提取逻辑
   try {
     let res = await fetch(`https://api.zzzmh.cn/token/parse?url=${encodeURIComponent(url)}`)
     let data = await res.json()
     if(data.code === 200 && data.data){
       let text = data.data.desc || data.data.title || "未提取到文案"
       showResult(text)
-      count++
-      localStorage.setItem('copy_cnt', count)
-      updateTip()
     }else{
       showResult("提取失败，请换个链接重试")
     }
@@ -87,7 +54,6 @@ function showResult(text){
   let r = document.getElementById('result')
   r.innerText = text
   r.style.display = 'block'
-  document.getElementById('pay').style.display = 'none'
 }
 </script>
 </body>
