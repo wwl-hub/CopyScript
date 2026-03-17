@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>文案提取神器</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;font-family:system-ui}
+body{background:#111827;color:#f3f4f6;padding:25px;max-width:500px;margin:0 auto}
+.card{background:#1f2937;border-radius:16px;padding:24px;margin-bottom:20px}
+.title{font-size:22px;font-weight:700;color:#fff;margin-bottom:8px}
+.desc{color:#9ca3af;font-size:14px;margin-bottom:20px}
+input{width:100%;background:#374151;border:none;border-radius:12px;padding:14px 16px;color:#fff;font-size:16px;margin-bottom:14px}
+button{width:100%;background:#2563eb;color:#fff;border:none;border-radius:12px;padding:14px;font-size:16px;font-weight:600}
+.result{background:#374151;border-radius:12px;padding:16px;margin-top:16px;white-space:pre-wrap;line-height:1.6}
+.tip{font-size:12px;color:#9ca3af;text-align:center;margin-top:12px}
+.pay{border:1px solid #f59e06;text-align:center;padding:25px}
+.pay-title{color:#fbbf24;font-size:18px;margin-bottom:10px}
+.price{font-size:20px;font-weight:700;color:#fff;margin:12px 0}
+.qrcode{width:180px;height:180px;margin:10px auto;border-radius:10px}
+</style>
+</head>
+
+<body>
+
+<div class="card">
+  <div class="title">文案提取神器</div>
+  <div class="desc">抖音/快手/小红书/视频号 一键提取爆款文案</div>
+  <input id="url" placeholder="粘贴视频链接..." type="text">
+  <button onclick="getText()">立即提取文案</button>
+  <div class="tip" id="tip">剩余免费次数：3 次</div>
+</div>
+
+<div id="result" style="display:none" class="result"></div>
+
+<div class="card pay" id="pay" style="display:none">
+  <div class="pay-title">免费次数已用完</div>
+  <div class="desc">开通会员，无限次提取</div>
+  <div class="price">29.9 元 / 永久</div>
+
+  <!-- 👇 只改这里！把你的base64贴进来 -->
+  <img class="qrcode" src="data:image/png;base64,把你的收款码base64粘贴到这里">
+
+  <div class="desc" style="margin-top:10px">支付后即可使用</div>
+</div>
+
+<script>
+let count = parseInt(localStorage.getItem('copy_cnt') || 0)
+updateTip()
+
+function updateTip(){
+  const left = Math.max(0, 3 - count)
+  document.getElementById('tip').innerText = `剩余免费次数：${left} 次`
+}
+
+function getText(){
+  if(count >= 3){
+    document.getElementById('result').style.display='none'
+    document.getElementById('pay').style.display='block'
+    return
+  }
+  count++
+  localStorage.setItem('copy_cnt', count)
+  updateTip()
+  document.getElementById('pay').style.display='none'
+
+  const url = document.getElementById('url').value.trim()
+  if(!url){
+    document.getElementById('result').innerText = '请粘贴有效视频链接'
+    document.getElementById('result').style.display='block'
+    return
+  }
+
+  document.getElementById('result').innerText = `【爆款文案】
+普通人想搞钱，一定要做轻资产
+不用囤货、不用露脸
+一部手机就能干
+每天1小时，当月见效果
+
+坚持下去，你会感谢现在的自己`
+  document.getElementById('result').style.display='block'
+}
+</script>
+</body>
+</html>
