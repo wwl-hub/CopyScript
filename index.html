@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>文案提取神器</title>
+<title>CopyScript - 视频文案提取</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;font-family:system-ui}
 body{background:#111827;color:#f3f4f6;padding:25px;max-width:500px;margin:0 auto}
@@ -24,10 +24,10 @@ button{width:100%;background:#2563eb;color:#fff;border:none;border-radius:12px;p
 <body>
 
 <div class="card">
-  <div class="title">文案提取神器</div>
-  <div class="desc">抖音/快手/小红书/视频号 一键提取爆款文案</div>
-  <input id="url" placeholder="粘贴视频链接..." type="text">
-  <button onclick="getText()">立即提取文案</button>
+  <div class="title">CopyScript</div>
+  <div class="desc">抖音链接粘贴，一键提取真实文案</div>
+  <input id="url" placeholder="粘贴抖音分享链接..." type="text">
+  <button onclick="getScript()">立即提取</button>
   <div class="tip" id="tip">剩余免费次数：3 次</div>
 </div>
 
@@ -38,8 +38,7 @@ button{width:100%;background:#2563eb;color:#fff;border:none;border-radius:12px;p
   <div class="desc">开通会员，无限次提取</div>
   <div class="price">29.9 元 / 永久</div>
 
-  <!-- 👇 只改这里！把你的base64贴进来 -->
-  <img class="qrcode" src="data:image/png;base64,把你的收款码base64粘贴到这里">
+  <img class="qrcode" src="data:image/png;base64,这里替换成你的微信收款码base64">
 
   <div class="desc" style="margin-top:10px">支付后即可使用</div>
 </div>
@@ -50,35 +49,45 @@ updateTip()
 
 function updateTip(){
   const left = Math.max(0, 3 - count)
-  document.getElementById('tip').innerText = `剩余免费次数：${left} 次`
+  document.getElementById('tip').innerText = `Free: ${left} times left`
 }
 
-function getText(){
+async function getScript(){
   if(count >= 3){
     document.getElementById('result').style.display='none'
     document.getElementById('pay').style.display='block'
     return
   }
-  count++
-  localStorage.setItem('copy_cnt', count)
-  updateTip()
-  document.getElementById('pay').style.display='none'
 
-  const url = document.getElementById('url').value.trim()
+  let url = document.getElementById('url').value.trim()
   if(!url){
-    document.getElementById('result').innerText = '请粘贴有效视频链接'
-    document.getElementById('result').style.display='block'
+    showResult("请输入抖音链接")
     return
   }
 
-  document.getElementById('result').innerText = `【爆款文案】
-普通人想搞钱，一定要做轻资产
-不用囤货、不用露脸
-一部手机就能干
-每天1小时，当月见效果
+  // 真实提取逻辑
+  try {
+    let res = await fetch(`https://api.zzzmh.cn/token/parse?url=${encodeURIComponent(url)}`)
+    let data = await res.json()
+    if(data.code === 200 && data.data){
+      let text = data.data.desc || data.data.title || "未提取到文案"
+      showResult(text)
+      count++
+      localStorage.setItem('copy_cnt', count)
+      updateTip()
+    }else{
+      showResult("提取失败，请换个链接重试")
+    }
+  }catch(e){
+    showResult("提取失败，链接可能无效")
+  }
+}
 
-坚持下去，你会感谢现在的自己`
-  document.getElementById('result').style.display='block'
+function showResult(text){
+  let r = document.getElementById('result')
+  r.innerText = text
+  r.style.display = 'block'
+  document.getElementById('pay').style.display = 'none'
 }
 </script>
 </body>
